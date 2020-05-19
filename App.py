@@ -72,5 +72,5 @@ class App:
         print("Time needed: +" + str(time.time() - start))
 
 
-App.run("zdj.jpg")
+#App.run("zdj.jpg")
 App.learn_machine()

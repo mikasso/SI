@@ -6,8 +6,8 @@ import os
 
 
 class ImageConverter:
-    def __init__(self, save_images=1, black_percentage=10, maximal_space_between_columns=5,
-                 minimal_width_of_image=15, minimal_height_of_image=15, black_pixels_threshold=1):
+    def __init__(self, save_images=1, black_percentage=6, maximal_space_between_columns=5,
+                 minimal_width_of_image=20, minimal_height_of_image=20, black_pixels_threshold=2):
         self.image = 0
         self.name = "None"
         # flag representing if ImageConverter should save images during work
@@ -87,30 +87,31 @@ class ImageConverter:
         return data
 
     def __delete_empty_rows(self, image):
+        up_pointer = 0
+        down_pointer = len(image)-1
+        row_size = len(image[0])
         rows_to_delete = []
-        for row in range(len(image)):
-            s = len(image[0]) - sum(image[row])  # count how many black pixels in a row there are
+        while up_pointer < down_pointer:
+            s = row_size - sum(image[up_pointer])
             if s < self.black_pixels_threshold:
-                rows_to_delete.append(image[row])  # if less than the threshold then delete the row
-
-        height = len(image)
-        i = len(rows_to_delete)
-        while i > 0:
-            image.remove(rows_to_delete[0])
-            i -= 1
-            if i <= 0:
+                rows_to_delete.append(image[up_pointer])
+            up_pointer += 1
+            if up_pointer >= down_pointer:
                 break
-            image.remove(rows_to_delete[-1])
-            i -= 1
-            height -= 2
+            s = row_size - sum(image[down_pointer])
+            if s < self.black_pixels_threshold:
+                rows_to_delete.append(image[down_pointer])
+            down_pointer -= 1
+        height = len(image)
+        for row in rows_to_delete:
+            image.remove(row)
+            height -= 1
             if height <= Const.image_height:
                 break
-
         return image
 
     def __get_binary_image(self):
         self.image = self.image.convert('L')  # get monochromatic image
-
         array = numpy.array(self.image)
         percent = 15
         div = 100/percent
@@ -118,7 +119,6 @@ class ImageConverter:
         step = round(self.image.width/div)
         if step < 15:
             step = 15
-
         x = 0
         while x < self.image.width:
             if x + step < self.image.width:
@@ -133,7 +133,6 @@ class ImageConverter:
                         array[i][j] = 0
                     else:
                         array[i][j] = 1
-
             start = x
 
         self.image = Image.fromarray(numpy.array(array, dtype=bool))
@@ -179,14 +178,22 @@ class ImageConverter:
 
     def __delete_incorrect_images_from_list(self):
         trashes = []
-        i = 0
         for image in self.parted_images:  # detect all images that have small amount of black pixels
-            if len(image[0]) < self.minimal_width_of_image or len(image) < self.minimal_height_of_image:
-                trashes.append(i)
-            i = i + 1
+            if self.__removal_conditions(image):
+                trashes.append(image)
         for i in reversed(trashes):  # remove images which are trashes < 4 black pixels
-            self.parted_images.pop(i)
+            self.parted_images.remove(i)
         return
+
+    def __removal_conditions(self, image):
+        if len(image[0]) < self.minimal_width_of_image or len(image) < self.minimal_height_of_image:
+            return True
+        white_pixels = sum( sum(row) for row in image)
+        pixels = len(image[0])*len(image)
+        black_pixels_percent = 100 * (pixels - white_pixels)/pixels
+        if black_pixels_percent < 10:
+            return True
+        return False
 
     def __get_threshold(self, array):
         histogram = numpy.histogram(array)

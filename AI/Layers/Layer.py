@@ -53,8 +53,8 @@ class layer:
         name1 = 'Layer'
         name1 += n
         name1 += '_deltaWeights.npy'
-        np.save(name, np.array(self.weights))
-        np.save(name1, np.array(self.deltaWeights))
+        np.save(Const.layers_folder+"/"+name, np.array(self.weights))
+        np.save(Const.layers_folder+"/"+name1, np.array(self.deltaWeights))
 
     def load(self,n):
         name = 'Layer'
