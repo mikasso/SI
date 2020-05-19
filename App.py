@@ -8,7 +8,7 @@ import time
 
 class App:
     @staticmethod
-    def create_tests():                             # creates tests input photos from row of numbers/sings
+    def create_tests():                           # creates tests input photos from row of numbers/sings
         my_path = Const.pre_test_folder           # folder with photos to cut out
         only_files = [f for f in listdir(my_path) if isfile(join(my_path, f))]
 
@@ -72,5 +72,5 @@ class App:
         print("Time needed: +" + str(time.time() - start))
 
 
-path = "./zdj.jpg"
-App.run(path)
+App.run("zdj.jpg")
+App.learn_machine()

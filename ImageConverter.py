@@ -6,8 +6,8 @@ import os
 
 
 class ImageConverter:
-    def __init__(self, save_images=1, black_percentage=10, maximal_space_between_columns=2,
-                 minimal_width_of_image=20, minimal_height_of_image=20, black_pixels_threshold=1):
+    def __init__(self, save_images=1, black_percentage=10, maximal_space_between_columns=5,
+                 minimal_width_of_image=15, minimal_height_of_image=15, black_pixels_threshold=1):
         self.image = 0
         self.name = "None"
         # flag representing if ImageConverter should save images during work
@@ -30,18 +30,17 @@ class ImageConverter:
             try:
                 # Create target Directory
                 os.mkdir(Const.save_folder)
-                print("Directory ", "./saved", " has been created ")
+                print("Directory ", Const.save_folder, " has been created ")
             except FileExistsError:
-                print("Directory ", "./saved", " already exists and will be used to save images during processing them")
+                print("Directory ", Const.save_folder, " already exists and will be used to save images during processing them")
 
     def get_separated_images(self):
         self.__get_binary_image()                   # create a binary image
         self.image_array = numpy.array(self.image)  # transform the image to numpy array
-        self.parted_images = self.__part_image()    # delete all white rows from array and get array of separated nums
-        self.__delete_incorrect_images_from_list()  # delete wrong created images from parted images list
+        self.parted_images = self.__delete_empty_cols()  # delete all white rows from array and get array of separated nums
 
         for image in self.parted_images:            # check all images for white rows to delete
-            image = self.delete_empty_rows(image)
+            image = self.__delete_empty_rows(image)
 
         self.__delete_incorrect_images_from_list()  # delete wrong created images from parted images list
 
@@ -50,7 +49,7 @@ class ImageConverter:
         if self.save_images:
             try:
                 # Create target Directory
-                os.mkdir("./saved/"+self.name)
+                os.mkdir(Const.save_folder+"/"+self.name)
             except FileExistsError:
                 pass
 
@@ -59,7 +58,7 @@ class ImageConverter:
             self.parted_images[i] = Image.fromarray(numpy.array(self.parted_images[i]))
             self.parted_images[i] = self.parted_images[i].resize((Const.image_width, Const.image_height))
             if self.save_images:
-                names.append("./saved/"+self.name + '/' + i.__str__() + ".jpg")  # save a name
+                names.append(Const.save_folder+"/"+self.name + '/' + i.__str__() + ".jpg")  # save a name
                 self.parted_images[i].save(names[-1])
                 i = i+1
 
@@ -87,18 +86,14 @@ class ImageConverter:
 
         return data
 
-    def delete_empty_rows(self, image):
-        height = len(image)
-
+    def __delete_empty_rows(self, image):
         rows_to_delete = []
         for row in range(len(image)):
             s = len(image[0]) - sum(image[row])  # count how many black pixels in a row there are
             if s < self.black_pixels_threshold:
                 rows_to_delete.append(image[row])  # if less than the threshold then delete the row
-                height -= 1
-                if height <= Const.image_height:
-                    break
 
+        height = len(image)
         i = len(rows_to_delete)
         while i > 0:
             image.remove(rows_to_delete[0])
@@ -107,6 +102,9 @@ class ImageConverter:
                 break
             image.remove(rows_to_delete[-1])
             i -= 1
+            height -= 2
+            if height <= Const.image_height:
+                break
 
         return image
 
@@ -143,7 +141,7 @@ class ImageConverter:
         if self.save_images:
             self.image.save('./saved/binary.png')  # save the image for eventually have a look on it
 
-    def __part_image(self):  # return numpy arrays
+    def __delete_empty_cols(self):  # return numpy arrays
         # create separated images from image_array without white columns
         black_per_column = []
         for column in range(self.image.width):
@@ -182,15 +180,13 @@ class ImageConverter:
     def __delete_incorrect_images_from_list(self):
         trashes = []
         i = 0
-
         for image in self.parted_images:  # detect all images that have small amount of black pixels
-            a = image[0][0]
             if len(image[0]) < self.minimal_width_of_image or len(image) < self.minimal_height_of_image:
                 trashes.append(i)
-
             i = i + 1
         for i in reversed(trashes):  # remove images which are trashes < 4 black pixels
             self.parted_images.pop(i)
+        return
 
     def __get_threshold(self, array):
         histogram = numpy.histogram(array)

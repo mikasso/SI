@@ -40,9 +40,9 @@ class layer:
             delta = dSigmoidFunc(self.output[i])*error[i]
             for j in range(self.inputSize):
                 nextError[j] = nextError[j] + delta*self.weights[j + i * self.inputSize]
-                deltaWeight = NeuralNetworkConstants.learningRate * self.input[j] * delta
+                deltaWeight = Const.learningRate * self.input[j] * delta
                 self.weights[j + i * self.inputSize] += \
-                    deltaWeight + NeuralNetworkConstants.momentum * self.deltaWeights[j + i * self.inputSize]
+                    deltaWeight + Const.momentum * self.deltaWeights[j + i * self.inputSize]
                 self.deltaWeights[j + i * self.inputSize] = deltaWeight
         return nextError
 
