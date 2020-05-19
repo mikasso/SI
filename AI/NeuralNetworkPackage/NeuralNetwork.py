@@ -2,7 +2,7 @@ from AI.Layers.Layer import layer
 import operator
 
 
-class neuralNetwork:
+class NeuralNetwork:
     layers = []
 
     def __init__(self, inputSize,hiddenLayerSize, outputSize):

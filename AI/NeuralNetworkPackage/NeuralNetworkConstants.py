@@ -21,3 +21,4 @@ class NeuralNetworkConstants:
     pre_test_folder = "./test"
     training_folder = "./training_data"
     save_folder = "./saved"
+    layers_folder = "./AI/Layers"

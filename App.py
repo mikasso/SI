@@ -1,5 +1,5 @@
-from AI.NeuralNetwork import neuralNetwork
-from AI.NeuralNetwork.NeuralNetworkConstants import NeuralNetworkConstants as Const
+from AI.NeuralNetworkPackage.NeuralNetwork import NeuralNetwork
+from AI.NeuralNetworkPackage.NeuralNetworkConstants import NeuralNetworkConstants as Const
 from ImageConverter import ImageConverter
 from os import listdir
 from os.path import isfile, join
@@ -40,7 +40,7 @@ class App:
         training_path = Const.training_folder
         training_data_folders = [c for c in listdir(training_path)]  # get list of folders with data
         folder_nr = 0
-        neural_network = neuralNetwork(600, 400, 14)
+        neural_network = NeuralNetwork(600, 400, 14)
         neural_network.load()
         for folder in training_data_folders:
             folder_path = training_path + "/" + folder
@@ -57,13 +57,12 @@ class App:
         print("Time needed: +" + str(time.time() - start))
 
     @staticmethod
-    def main(path):
-        path = "./zdj.jpg"
+    def run(path):
         image_converter = ImageConverter(save_images=1)
         input_data = image_converter.get_ai_input_data(path)
 
         #  prepare objects for AI to work
-        x = neuralNetwork(600, 400, 14)
+        x = NeuralNetwork(600, 400, 14)
         x.load()
         start = time.time()
         for data in input_data:
@@ -71,3 +70,7 @@ class App:
             App.print_result(result)
             print("")
         print("Time needed: +" + str(time.time() - start))
+
+
+path = "./zdj.jpg"
+App.run(path)

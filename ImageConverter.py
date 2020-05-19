@@ -1,6 +1,6 @@
 from PIL import Image
 import numpy
-from AI.NeuralNetwork.NeuralNetworkConstants import NeuralNetworkConstants as Const
+from AI.NeuralNetworkPackage.NeuralNetworkConstants import NeuralNetworkConstants as Const
 from itertools import chain
 import os
 

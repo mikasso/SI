@@ -1,8 +1,8 @@
 import random
 import numpy as np
-from AI.NeuralNetwork.NeuralNetworkConstants import NeuralNetworkConstants
-from AI.NeuralNetwork.ActivationFunction import sigmoidFunc
-from AI.NeuralNetwork.ActivationFunction import dSigmoidFunc
+from AI.NeuralNetworkPackage.NeuralNetworkConstants import NeuralNetworkConstants as Const
+from AI.NeuralNetworkPackage.ActivationFunction import sigmoidFunc
+from AI.NeuralNetworkPackage.ActivationFunction import dSigmoidFunc
 
 class layer:
     weights = list()
@@ -63,5 +63,5 @@ class layer:
         name1 = 'Layer'
         name1 += n
         name1 += '_deltaWeights.npy'
-        self.weights = np.load(name)
-        self.deltaWeights = np.load(name1)
+        self.weights = np.load(Const.layers_folder+"/"+name)
+        self.deltaWeights = np.load(Const.layers_folder+"/"+name1)
