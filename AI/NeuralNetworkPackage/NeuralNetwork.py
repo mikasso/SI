@@ -1,6 +1,6 @@
 from AI.Layers.Layer import layer
 import operator
-
+import time
 
 class NeuralNetwork:
     layers = []
@@ -22,6 +22,7 @@ class NeuralNetwork:
         error = list(map(operator.sub, targetOutput, output))
         for i in range(len(self.layers)):
             error = self.layers[len(self.layers)-i-1].train(error)
+
 
     def save(self):
         self.layers[0].save('0')

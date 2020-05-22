@@ -4,6 +4,7 @@ from ImageConverter import ImageConverter
 from os import listdir
 from os.path import isfile, join
 import time
+import sys
 
 
 class App:
@@ -35,42 +36,50 @@ class App:
         print(Const.names[second], end=" ")
 
     @staticmethod
-    def learn_machine():
+    def learn_machine(iterations):
         start = time.time()
-        training_path = Const.training_folder
-        training_data_folders = [c for c in listdir(training_path)]  # get list of folders with data
-        folder_nr = 0
         neural_network = NeuralNetwork(600, 400, 14)
         neural_network.load()
-        for folder in training_data_folders:
-            folder_path = training_path + "/" + folder
-            training_files = [f for f in listdir(folder_path) if isfile(join(folder_path, f))]
-            for file in training_files:
-                file_path = folder_path + "/" + file
-                training_data = ImageConverter.get_raw_data(path=file_path)
-                neural_network.train(training_data, Const.training_result[folder_nr])
-                print(file_path + " done.")
-
-            print(folder_path + " done. Saving all changes to neural network.")
+        trainingData = [[[] for _ in range(30)] for _ in range(len(Const.names))]
+        for i in range(len(Const.training_result)):
+            for j in range(30):
+                file_path = Const.training_folder
+                file_path += "/"
+                file_path += Const.names[i]
+                file_path += "/"
+                file_path += str(j)
+                file_path += ".jpg"
+                trainingData[i][j] = ImageConverter.get_raw_data(path=file_path)
+        for n in range(iterations):
+            print(n)
+            for file_number in range(30):
+                for char_number in range(len(Const.names)):
+                    neural_network.train(trainingData[char_number][file_number], Const.training_result[char_number])
             neural_network.save()
-            folder_nr += 1
-        print("Time needed: +" + str(time.time() - start))
+        print("Time: %.2f " % (time.time() - start))
+
 
     @staticmethod
     def run(path):
         image_converter = ImageConverter(save_images=1)
+        start = time.time()
         input_data = image_converter.get_ai_input_data(path)
-
-        #  prepare objects for AI to work
+        print("Image conversion to data time:  %.2f s" % (time.time() - start))
+        #  prepare NN to work
         x = NeuralNetwork(600, 400, 14)
         x.load()
         start = time.time()
         for data in input_data:
             result = x.run(data)
-            App.print_result(result)
-            print("")
-        print("Time needed: +" + str(time.time() - start))
+            print(Const.characters[result.index(max(result))], end='')
+        print("")
+        print("Neural network time:  %.2f s" % (time.time() - start))
 
 
-#App.run("zdj.jpg")
-App.learn_machine()
+# ------------------------------------------------
+# Start
+print("Please enter image that u would like to test")
+image_path = input()
+App.run(image_path)
+
+

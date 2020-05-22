@@ -7,7 +7,7 @@ import os
 
 class ImageConverter:
     def __init__(self, save_images=1, black_percentage=6, maximal_space_between_columns=5,
-                 minimal_width_of_image=20, minimal_height_of_image=20, black_pixels_threshold=2):
+                 minimal_sizes=1250, black_pixels_threshold=2):
         self.image = 0
         self.name = "None"
         # flag representing if ImageConverter should save images during work
@@ -18,9 +18,8 @@ class ImageConverter:
         self.parted_images = []
         # how many black pixels in row or column are needed to not delete row or column
         self.black_pixels_threshold = black_pixels_threshold
-        # minimal width of image below which all others images will be deleted
-        self.minimal_width_of_image = minimal_width_of_image
-        self.minimal_height_of_image = minimal_height_of_image
+        # minimal sizes of image below which all others images will be deleted
+        self.minimal_sizes = minimal_sizes
         # maximal space between columns to set recognize that part of image has ended
         self.maximal_space_between_columns = maximal_space_between_columns
         # expected participation of the text in the image about the best is about 5 %
@@ -186,12 +185,12 @@ class ImageConverter:
         return
 
     def __removal_conditions(self, image):
-        if len(image[0]) < self.minimal_width_of_image or len(image) < self.minimal_height_of_image:
+        if len(image[0]) * len(image) < self.minimal_sizes:
             return True
         white_pixels = sum( sum(row) for row in image)
         pixels = len(image[0])*len(image)
         black_pixels_percent = 100 * (pixels - white_pixels)/pixels
-        if black_pixels_percent < 10:
+        if black_pixels_percent < 5:
             return True
         return False
 
